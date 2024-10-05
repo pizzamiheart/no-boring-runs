@@ -17,7 +17,8 @@ def init_db():
     cur.execute("""
     CREATE TABLE IF NOT EXISTS users (
         username VARCHAR(50) PRIMARY KEY,
-        password VARCHAR(100) NOT NULL
+        password VARCHAR(100) NOT NULL,
+        strava_token VARCHAR(100)
     )
     """)
     cur.execute("""
@@ -61,10 +62,10 @@ def user_exists(username):
     conn.close()
     return result is not None
 
-def create_user(username, password):
+def create_user(username, password, strava_connect):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, password))
+    cur.execute("INSERT INTO users (username, password, strava_token) VALUES (%s, %s, %s)", (username, password, None))
     conn.commit()
     cur.close()
     conn.close()
