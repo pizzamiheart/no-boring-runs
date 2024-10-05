@@ -14,9 +14,12 @@ def login(username, password):
             logger.info(f"User data found: {user_data[0]}, Password hash: {user_data[1][:10]}...")
         else:
             logger.warning(f"No user data found for {username}")
-        if database.authenticate_user(username, password):
+        auth_result = database.authenticate_user(username, password)
+        print(f"Authentication result: {auth_result}")  # Add this line
+        if auth_result:
             st.session_state.user = username
             logger.info(f"User {username} logged in successfully")
+            print(f"Session state after login: {st.session_state}")  # Add this line
             st.success(f"Logged in as {username}")
             st.rerun()
         else:

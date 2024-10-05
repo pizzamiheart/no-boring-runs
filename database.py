@@ -52,15 +52,18 @@ def init_db():
 def authenticate_user(username, password):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("SELECT * FROM users WHERE username = %s AND password = %s", (username, password))
+    cur.execute("SELECT * FROM users WHERE username = %s", (username,))
     result = cur.fetchone()
     cur.close()
     conn.close()
     if result:
+        stored_password = result[1]
+        print(f"Stored password: {stored_password}, Provided password: {password}")
         logger.info(f"User {username} authenticated successfully")
+        return stored_password == password
     else:
         logger.warning(f"Authentication failed for user {username}")
-    return result is not None
+        return False
 
 def user_exists(username):
     conn = get_db_connection()

@@ -24,6 +24,13 @@ if 'user' not in st.session_state:
 def main():
     st.title("Not Boring Runs 🏃")
 
+    # Debug section
+    st.sidebar.subheader("Debug")
+    st.sidebar.write(f"Current session state: {st.session_state}")
+    if st.sidebar.button("Clear Session"):
+        st.session_state.clear()
+        st.rerun()
+
     # Sidebar for navigation
     menu = ["Home", "Login", "Register", "Dashboard", "New Run"]
     choice = st.sidebar.selectbox("Menu", menu)
