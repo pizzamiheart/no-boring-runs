@@ -23,13 +23,15 @@ if 'user' not in st.session_state:
 
 def main():
     st.title("Not Boring Runs 🏃")
+    
+    print(f"Current session state at the beginning of main(): {st.session_state}")
 
     # Debug section
     st.sidebar.subheader("Debug")
     st.sidebar.write(f"Current session state: {st.session_state}")
     if st.sidebar.button("Clear Session"):
         st.session_state.clear()
-        st.rerun()
+        st.experimental_rerun()
 
     # Sidebar for navigation
     menu = ["Home", "Login", "Register", "Dashboard", "New Run"]
@@ -53,6 +55,7 @@ def main():
         auth.register()
 
     elif choice == "Dashboard":
+        print(f"Is user authenticated? {st.session_state.user is not None}")
         if st.session_state.user:
             show_dashboard()
         else:
@@ -123,7 +126,7 @@ def create_journey():
         start_position = map_utils.generate_random_start_point()
         database.create_user_journey(st.session_state.user, total_miles, start_date, end_date, start_position)
         st.success("Journey created successfully!")
-        st.rerun()
+        st.experimental_rerun()
 
 def add_new_run():
     st.subheader("Add New Run")
@@ -137,7 +140,7 @@ def add_new_run():
         new_position = run_utils.update_position(st.session_state.user, distance)
         database.update_user_position(st.session_state.user, new_position)
         st.success("Run added successfully!")
-        st.rerun()
+        st.experimental_rerun()
 
 if __name__ == "__main__":
     main()

@@ -15,13 +15,14 @@ def login(username, password):
         else:
             logger.warning(f"No user data found for {username}")
         auth_result = database.authenticate_user(username, password)
-        print(f"Authentication result: {auth_result}")  # Add this line
+        print(f"Authentication result: {auth_result}")
         if auth_result:
+            print(f"Session state before login: {st.session_state}")
             st.session_state.user = username
+            print(f"Session state after login: {st.session_state}")
             logger.info(f"User {username} logged in successfully")
-            print(f"Session state after login: {st.session_state}")  # Add this line
             st.success(f"Logged in as {username}")
-            st.rerun()
+            st.experimental_rerun()
         else:
             logger.warning(f"Failed login attempt for user {username}")
             st.error("Invalid username or password")

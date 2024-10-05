@@ -59,8 +59,10 @@ def authenticate_user(username, password):
     if result:
         stored_password = result[1]
         print(f"Stored password: {stored_password}, Provided password: {password}")
+        password_match = stored_password == password
+        print(f"Password match result: {password_match}")
         logger.info(f"User {username} authenticated successfully")
-        return stored_password == password
+        return password_match
     else:
         logger.warning(f"Authentication failed for user {username}")
         return False
