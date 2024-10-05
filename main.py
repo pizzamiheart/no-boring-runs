@@ -4,6 +4,7 @@ import database
 from strava_utils import get_strava_client, strava_callback, get_strava_activities
 import logging
 import map_utils
+import pandas as pd
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -72,7 +73,7 @@ def display_dashboard():
                     st.success(message)
                     # Display the starting point on a map
                     starting_point = database.get_user_journey(st.session_state.user)[3]
-                    st.map([starting_point])
+                    st.map(pd.DataFrame({'lat': [starting_point[0]], 'lon': [starting_point[1]]}))
                 else:
                     st.error(message)
 
@@ -108,7 +109,7 @@ def display_dashboard():
         total_miles, start_date, end_date, current_position = journey
         progress = (current_position[0] / total_miles) * 100
         st.progress(progress)
-        st.map([current_position])
+        st.map(pd.DataFrame({'lat': [current_position[0]], 'lon': [current_position[1]]}))
 
         # Display user's runs
         runs = database.get_user_runs(st.session_state.user)
