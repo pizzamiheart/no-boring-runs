@@ -21,6 +21,10 @@ def main():
     # Check if user is logged in
     if st.session_state.user:
         logger.info(f"User {st.session_state.user} is logged in")
+        st.sidebar.success(f"Logged in as {st.session_state.user}")
+        if st.sidebar.button("Logout"):
+            st.session_state.user = None
+            st.rerun()
     else:
         logger.info("No user logged in")
 
@@ -59,7 +63,7 @@ def login():
             st.session_state.user = username
             logger.info(f"User {username} logged in successfully")
             st.success(f"Logged in as {username}")
-            st.experimental_rerun()
+            st.rerun()
         else:
             logger.warning(f"Failed login attempt for user {username}")
             st.error("Invalid username or password")
@@ -94,7 +98,7 @@ def add_run_page():
     if st.button("Save Run"):
         add_run(st.session_state.user, distance, date)
         st.success("Run added successfully!")
-        st.experimental_rerun()
+        st.rerun()
 
 if __name__ == "__main__":
     init_db()  # Initialize the database

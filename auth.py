@@ -22,7 +22,7 @@ def login(username, password):
             logger.info(f"Session state after login: {st.session_state}")
             logger.info(f"User {username} logged in successfully")
             st.success(f"Logged in as {username}")
-            st.experimental_rerun()
+            st.rerun()
         else:
             logger.warning(f"Failed login attempt for user {username}")
             st.error("Invalid username or password")
@@ -46,6 +46,7 @@ def register():
                 database.create_user(new_username, new_password, strava_connect)
                 logger.info(f"User {new_username} registered successfully")
                 st.success("Account created successfully. Please log in.")
+                st.rerun()  # Redirect to login page after successful registration
             except Exception as e:
                 logger.error(f"Error during user registration: {str(e)}")
                 st.error("An error occurred during registration. Please try again later.")
