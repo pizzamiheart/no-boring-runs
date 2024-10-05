@@ -9,10 +9,10 @@ import map_utils
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-st.set_page_config(page_title="Not Boring Runs", page_icon="🏃", layout="wide")
+st.set_page_config(page_title="No Boring Runs", page_icon="🏃", layout="wide")
 
 def main():
-    st.title("Not Boring Runs 🏃")
+    st.title("No Boring Runs 🏃")
 
     if 'user' not in st.session_state:
         st.session_state.user = None

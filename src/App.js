@@ -11,7 +11,7 @@ function App() {
     <Router>
       <div className="App">
         <header className="App-header">
-          <h1>Not Boring Runs 🏃</h1>
+          <h1>No Boring Runs 🏃</h1>
         </header>
         <Switch>
           <Route exact path="/" component={Home} />

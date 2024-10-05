@@ -48,6 +48,7 @@ def init_db():
     conn.commit()
     cur.close()
     conn.close()
+    logger.info("No Boring Runs database initialized")
 
 def create_user(username, password, strava_token=None):
     conn = get_db_connection()

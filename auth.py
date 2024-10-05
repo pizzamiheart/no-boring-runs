@@ -13,13 +13,13 @@ def login(username, password):
         user_data = database.get_user_data(username)
         if user_data and user_data['password'] == password:
             st.session_state.user = username
-            logger.info(f"User {username} logged in successfully")
+            logger.info(f"User {username} logged in successfully to No Boring Runs")
             return True, f"Logged in as {username}"
         else:
             logger.warning(f"Failed login attempt for user {username}")
             return False, "Invalid username or password"
     except Exception as e:
-        logger.error(f"Error during login process: {str(e)}")
+        logger.error(f"Error during login process for No Boring Runs: {str(e)}")
         return False, "An error occurred during login. Please try again later."
 
 def register(new_username, new_password, confirm_password):
