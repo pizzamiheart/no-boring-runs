@@ -2,6 +2,7 @@ import streamlit as st
 import logging
 from database import get_db_connection, init_db, authenticate_user, create_user, user_exists, get_user_journey, add_run, get_user_runs
 import datetime
+import auth
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -16,6 +17,12 @@ if 'user' not in st.session_state:
 
 def main():
     st.title("Not Boring Runs 🏃")
+
+    # Check if user is logged in
+    if st.session_state.user:
+        logger.info(f"User {st.session_state.user} is logged in")
+    else:
+        logger.info("No user logged in")
 
     # Sidebar for navigation
     menu = ["Home", "Login", "Register", "Dashboard", "Add Run"]
@@ -47,26 +54,18 @@ def login():
     username = st.text_input("Username", key="login_username")
     password = st.text_input("Password", type="password", key="login_password")
     if st.button("Login"):
+        logger.info(f"Login attempt for user: {username}")
         if authenticate_user(username, password):
             st.session_state.user = username
+            logger.info(f"User {username} logged in successfully")
             st.success(f"Logged in as {username}")
-            st.rerun()
+            st.experimental_rerun()
         else:
+            logger.warning(f"Failed login attempt for user {username}")
             st.error("Invalid username or password")
 
 def register():
-    st.subheader("Create New Account")
-    new_username = st.text_input("Username")
-    new_password = st.text_input("Password", type="password")
-    confirm_password = st.text_input("Confirm Password", type="password")
-    if st.button("Register"):
-        if new_password != confirm_password:
-            st.error("Passwords do not match")
-        elif user_exists(new_username):
-            st.error("Username already exists")
-        else:
-            create_user(new_username, new_password, False)
-            st.success("Account created successfully. Please log in.")
+    auth.register()
 
 def dashboard():
     st.subheader(f"Welcome, {st.session_state.user}!")
@@ -95,7 +94,7 @@ def add_run_page():
     if st.button("Save Run"):
         add_run(st.session_state.user, distance, date)
         st.success("Run added successfully!")
-        st.rerun()
+        st.experimental_rerun()
 
 if __name__ == "__main__":
     init_db()  # Initialize the database
