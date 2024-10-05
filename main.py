@@ -29,7 +29,13 @@ def main():
         st.write("Gamify your running experience with virtual journeys across the world!")
 
     elif choice == "Login":
-        auth.login()
+        with st.form("login_form"):
+            st.subheader("Login")
+            username = st.text_input("Username")
+            password = st.text_input("Password", type="password")
+            submit_button = st.form_submit_button("Login")
+            if submit_button:
+                auth.login()
 
     elif choice == "Register":
         auth.register()
@@ -98,7 +104,7 @@ def create_journey():
         start_position = map_utils.generate_random_start_point()
         database.create_user_journey(st.session_state.user, total_miles, start_date, end_date, start_position)
         st.success("Journey created successfully!")
-        st.experimental_rerun()
+        st.rerun()
 
 def add_new_run():
     st.subheader("Add New Run")
@@ -112,7 +118,7 @@ def add_new_run():
         new_position = run_utils.update_position(st.session_state.user, distance)
         database.update_user_position(st.session_state.user, new_position)
         st.success("Run added successfully!")
-        st.experimental_rerun()
+        st.rerun()
 
 if __name__ == "__main__":
     main()
