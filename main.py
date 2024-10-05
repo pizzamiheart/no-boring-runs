@@ -44,13 +44,13 @@ def home():
 
 def login():
     st.subheader("Login")
-    username = st.text_input("Username")
-    password = st.text_input("Password", type="password")
+    username = st.text_input("Username", key="login_username")
+    password = st.text_input("Password", type="password", key="login_password")
     if st.button("Login"):
         if authenticate_user(username, password):
             st.session_state.user = username
             st.success(f"Logged in as {username}")
-            st.experimental_rerun()
+            st.rerun()
         else:
             st.error("Invalid username or password")
 
@@ -95,7 +95,7 @@ def add_run_page():
     if st.button("Save Run"):
         add_run(st.session_state.user, distance, date)
         st.success("Run added successfully!")
-        st.experimental_rerun()
+        st.rerun()
 
 if __name__ == "__main__":
     init_db()  # Initialize the database
