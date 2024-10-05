@@ -40,11 +40,7 @@ def main():
             password = st.text_input("Password", type="password", key="login_password")
             submit_button = st.form_submit_button("Login")
         if submit_button:
-            try:
-                auth.login(username, password)
-            except Exception as e:
-                st.error(f"An error occurred during login: {str(e)}")
-                logger.error(f"Login error: {str(e)}")
+            auth.login(username, password)
 
     elif choice == "Register":
         auth.register()
@@ -100,6 +96,13 @@ def show_dashboard():
                 st.write(f"Date: {run['date']}, Distance: {run['distance']} miles")
         else:
             st.info("No runs recorded yet. Start running!")
+
+        # Display Strava connection status
+        user_data = database.get_user_data(st.session_state.user)
+        if user_data and user_data[2]:  # Assuming the third element is the strava_token
+            st.success("Connected with Strava")
+        else:
+            st.warning("Not connected with Strava. Connect in settings to automatically sync your runs.")
 
 def create_journey():
     st.subheader("Create Your Journey")

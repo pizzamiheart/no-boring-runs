@@ -11,7 +11,9 @@ def login(username, password):
         logger.info(f"Attempting login for user: {username}")
         user_data = database.get_user_data(username)
         if user_data:
-            logger.info(f"User data found: {user_data[0]}, Password: {'*' * len(user_data[1])}")
+            logger.info(f"User data found: {user_data[0]}, Password hash: {user_data[1][:10]}...")
+        else:
+            logger.warning(f"No user data found for {username}")
         if database.authenticate_user(username, password):
             st.session_state.user = username
             logger.info(f"User {username} logged in successfully")
@@ -29,12 +31,17 @@ def register():
     new_username = st.text_input("Username")
     new_password = st.text_input("Password", type="password")
     confirm_password = st.text_input("Confirm Password", type="password")
-    strava_connect = st.checkbox("Connect with Strava")
+    strava_connect = st.checkbox("Connect with Strava (optional)")
     if st.button("Register"):
         if new_password != confirm_password:
             st.error("Passwords do not match")
         elif database.user_exists(new_username):
             st.error("Username already exists")
         else:
-            database.create_user(new_username, new_password, strava_connect)
-            st.success("Account created successfully. Please log in.")
+            try:
+                database.create_user(new_username, new_password, strava_connect)
+                logger.info(f"User {new_username} registered successfully")
+                st.success("Account created successfully. Please log in.")
+            except Exception as e:
+                logger.error(f"Error during user registration: {str(e)}")
+                st.error("An error occurred during registration. Please try again later.")

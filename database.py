@@ -79,6 +79,7 @@ def create_user(username, password, strava_connect):
     conn.commit()
     cur.close()
     conn.close()
+    logger.info(f"User {username} created successfully")
 
 def create_user_journey(username, total_miles, start_date, end_date, start_position):
     conn = get_db_connection()
@@ -90,6 +91,7 @@ def create_user_journey(username, total_miles, start_date, end_date, start_posit
     conn.commit()
     cur.close()
     conn.close()
+    logger.info(f"Journey created for user {username}")
 
 def get_user_journey(username):
     conn = get_db_connection()
@@ -113,6 +115,7 @@ def add_run(username, distance, date):
     conn.commit()
     cur.close()
     conn.close()
+    logger.info(f"Run added for user {username}")
 
 def get_user_runs(username):
     conn = get_db_connection()
@@ -133,11 +136,12 @@ def update_user_position(username, new_position):
     conn.commit()
     cur.close()
     conn.close()
+    logger.info(f"Updated position for user {username}")
 
 def get_user_data(username):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("SELECT username, password FROM users WHERE username = %s", (username,))
+    cur.execute("SELECT username, password, strava_token FROM users WHERE username = %s", (username,))
     result = cur.fetchone()
     cur.close()
     conn.close()
@@ -147,51 +151,5 @@ def get_user_data(username):
         logger.warning(f"No user data found for {username}")
     return result
 
-def recreate_all_tables():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    
-    # Drop all tables
-    cur.execute("DROP TABLE IF EXISTS runs CASCADE")
-    cur.execute("DROP TABLE IF EXISTS journeys CASCADE")
-    cur.execute("DROP TABLE IF EXISTS users CASCADE")
-    
-    # Recreate tables in the correct order
-    cur.execute('''
-    CREATE TABLE users (
-        username VARCHAR(50) PRIMARY KEY,
-        password VARCHAR(100) NOT NULL,
-        strava_token VARCHAR(100)
-    )
-    ''')
-    
-    cur.execute('''
-    CREATE TABLE journeys (
-        username VARCHAR(50) PRIMARY KEY,
-        total_miles FLOAT NOT NULL,
-        start_date DATE NOT NULL,
-        end_date DATE NOT NULL,
-        current_position POINT NOT NULL,
-        FOREIGN KEY (username) REFERENCES users(username)
-    )
-    ''')
-    
-    cur.execute('''
-    CREATE TABLE runs (
-        id SERIAL PRIMARY KEY,
-        username VARCHAR(50) NOT NULL,
-        distance FLOAT NOT NULL,
-        date DATE NOT NULL,
-        FOREIGN KEY (username) REFERENCES users(username)
-    )
-    ''')
-    
-    conn.commit()
-    cur.close()
-    conn.close()
-
 # Initialize the database
 init_db()
-
-# Recreate all tables
-recreate_all_tables()
