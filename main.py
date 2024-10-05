@@ -24,15 +24,17 @@ def main():
 def display_login_register():
     choice = st.sidebar.selectbox("Login/Signup", ["Login", "Sign Up"])
     if choice == "Login":
-        username = st.sidebar.text_input("Username")
-        password = st.sidebar.text_input("Password", type="password")
-        if st.sidebar.button("Login"):
-            success, message = auth.login(username, password)
-            if success:
-                st.success(message)
-                st.rerun()
-            else:
-                st.error(message)
+        with st.form("login_form"):
+            username = st.text_input("Username")
+            password = st.text_input("Password", type="password")
+            submit_button = st.form_submit_button("Login")
+            if submit_button:
+                success, message = auth.login(username, password)
+                if success:
+                    st.success(message)
+                    st.rerun()
+                else:
+                    st.error(message)
     else:
         with st.form("register_form"):
             new_username = st.text_input("Username")
