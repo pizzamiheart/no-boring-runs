@@ -125,10 +125,16 @@ def update_user_position(username, new_position):
     cur.close()
     conn.close()
 
-def recreate_users_table():
+def recreate_all_tables():
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("DROP TABLE IF EXISTS users")
+    
+    # Drop all tables
+    cur.execute("DROP TABLE IF EXISTS runs CASCADE")
+    cur.execute("DROP TABLE IF EXISTS journeys CASCADE")
+    cur.execute("DROP TABLE IF EXISTS users CASCADE")
+    
+    # Recreate tables in the correct order
     cur.execute('''
     CREATE TABLE users (
         username VARCHAR(50) PRIMARY KEY,
@@ -136,6 +142,28 @@ def recreate_users_table():
         strava_token VARCHAR(100)
     )
     ''')
+    
+    cur.execute('''
+    CREATE TABLE journeys (
+        username VARCHAR(50) PRIMARY KEY,
+        total_miles FLOAT NOT NULL,
+        start_date DATE NOT NULL,
+        end_date DATE NOT NULL,
+        current_position POINT NOT NULL,
+        FOREIGN KEY (username) REFERENCES users(username)
+    )
+    ''')
+    
+    cur.execute('''
+    CREATE TABLE runs (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(50) NOT NULL,
+        distance FLOAT NOT NULL,
+        date DATE NOT NULL,
+        FOREIGN KEY (username) REFERENCES users(username)
+    )
+    ''')
+    
     conn.commit()
     cur.close()
     conn.close()
@@ -143,5 +171,5 @@ def recreate_users_table():
 # Initialize the database
 init_db()
 
-# Uncomment the following line to recreate the users table
-recreate_users_table()
+# Recreate all tables
+recreate_all_tables()
