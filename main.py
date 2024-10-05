@@ -5,6 +5,11 @@ import auth
 import database
 import map_utils
 import run_utils
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 st.set_page_config(page_title="Not Boring Runs", page_icon="🏃", layout="wide")
 
@@ -34,8 +39,12 @@ def main():
             username = st.text_input("Username", key="login_username")
             password = st.text_input("Password", type="password", key="login_password")
             submit_button = st.form_submit_button("Login")
-            if submit_button:
+        if submit_button:
+            try:
                 auth.login(username, password)
+            except Exception as e:
+                st.error(f"An error occurred during login: {str(e)}")
+                logger.error(f"Login error: {str(e)}")
 
     elif choice == "Register":
         auth.register()
