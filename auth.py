@@ -8,6 +8,10 @@ logger = logging.getLogger(__name__)
 
 def login(username, password):
     try:
+        logger.info(f"Attempting login for user: {username}")
+        user_data = database.get_user_data(username)
+        if user_data:
+            logger.info(f"User data found: {user_data[0]}, Password: {'*' * len(user_data[1])}")
         if database.authenticate_user(username, password):
             st.session_state.user = username
             logger.info(f"User {username} logged in successfully")

@@ -1,6 +1,11 @@
 import psycopg2
 import os
 from psycopg2.extras import RealDictCursor
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def get_db_connection():
     return psycopg2.connect(
@@ -51,6 +56,10 @@ def authenticate_user(username, password):
     result = cur.fetchone()
     cur.close()
     conn.close()
+    if result:
+        logger.info(f"User {username} authenticated successfully")
+    else:
+        logger.warning(f"Authentication failed for user {username}")
     return result is not None
 
 def user_exists(username):
@@ -124,6 +133,19 @@ def update_user_position(username, new_position):
     conn.commit()
     cur.close()
     conn.close()
+
+def get_user_data(username):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT username, password FROM users WHERE username = %s", (username,))
+    result = cur.fetchone()
+    cur.close()
+    conn.close()
+    if result:
+        logger.info(f"User data retrieved for {username}")
+    else:
+        logger.warning(f"No user data found for {username}")
+    return result
 
 def recreate_all_tables():
     conn = get_db_connection()
