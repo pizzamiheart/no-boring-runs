@@ -1,20 +1,13 @@
 import streamlit as st
 import database
 
-def login():
-    st.subheader("Login")
-    username = st.text_input("Username")
-    password = st.text_input("Password", type="password")
-    if st.button("Login"):
-        try:
-            if database.authenticate_user(username, password):
-                st.session_state.user = username
-                st.success(f"Logged in as {username}")
-                st.rerun()
-            else:
-                st.error("Invalid username or password")
-        except Exception as e:
-            st.error(f"An error occurred: {str(e)}")
+def login(username, password):
+    if database.authenticate_user(username, password):
+        st.session_state.user = username
+        st.success(f"Logged in as {username}")
+        st.rerun()
+    else:
+        st.error("Invalid username or password")
 
 def register():
     st.subheader("Create New Account")
