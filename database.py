@@ -65,7 +65,8 @@ def user_exists(username):
 def create_user(username, password, strava_connect):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("INSERT INTO users (username, password, strava_token) VALUES (%s, %s, %s)", (username, password, None))
+    strava_token = 'pending' if strava_connect else None
+    cur.execute("INSERT INTO users (username, password, strava_token) VALUES (%s, %s, %s)", (username, password, strava_token))
     conn.commit()
     cur.close()
     conn.close()
@@ -124,5 +125,23 @@ def update_user_position(username, new_position):
     cur.close()
     conn.close()
 
+def recreate_users_table():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("DROP TABLE IF EXISTS users")
+    cur.execute('''
+    CREATE TABLE users (
+        username VARCHAR(50) PRIMARY KEY,
+        password VARCHAR(100) NOT NULL,
+        strava_token VARCHAR(100)
+    )
+    ''')
+    conn.commit()
+    cur.close()
+    conn.close()
+
 # Initialize the database
 init_db()
+
+# Uncomment the following line to recreate the users table
+recreate_users_table()
