@@ -17,56 +17,74 @@ def main():
         st.session_state.user = None
 
     if st.session_state.user:
-        st.sidebar.success(f"Logged in as {st.session_state.user}")
-        if st.sidebar.button("Logout"):
-            auth.logout()
+        display_dashboard()
     else:
-        choice = st.sidebar.selectbox("Login/Signup", ["Login", "Sign Up"])
-        if choice == "Login":
-            username = st.sidebar.text_input("Username")
-            password = st.sidebar.text_input("Password", type="password")
-            if st.sidebar.button("Login"):
-                auth.login(username, password)
-        else:
-            auth.register()
+        display_login_register()
 
-    if st.session_state.user:
-        menu = ["Dashboard", "Add Run", "Strava Activities"]
-        choice = st.sidebar.selectbox("Menu", menu)
+def display_login_register():
+    choice = st.sidebar.selectbox("Login/Signup", ["Login", "Sign Up"])
+    if choice == "Login":
+        username = st.sidebar.text_input("Username")
+        password = st.sidebar.text_input("Password", type="password")
+        if st.sidebar.button("Login"):
+            success, message = auth.login(username, password)
+            if success:
+                st.success(message)
+                st.rerun()
+            else:
+                st.error(message)
+    else:
+        with st.form("register_form"):
+            new_username = st.text_input("Username")
+            new_password = st.text_input("Password", type="password")
+            confirm_password = st.text_input("Confirm Password", type="password")
+            submit_button = st.form_submit_button("Register")
+            if submit_button:
+                success, message = auth.register(new_username, new_password, confirm_password)
+                if success:
+                    st.success(message)
+                else:
+                    st.error(message)
 
-        if choice == "Dashboard":
-            st.subheader("Dashboard")
-            # Add dashboard content here
+def display_dashboard():
+    st.sidebar.success(f"Logged in as {st.session_state.user}")
+    if st.sidebar.button("Logout"):
+        message = auth.logout()
+        st.success(message)
+        st.rerun()
 
-        elif choice == "Add Run":
-            st.subheader("Add New Run")
+    menu = ["Journey Setup", "Add Run", "Strava Activities"]
+    choice = st.sidebar.selectbox("Menu", menu)
+
+    if choice == "Journey Setup":
+        st.subheader("Set Up Your Journey")
+        # TODO: Implement journey setup form
+
+    elif choice == "Add Run":
+        st.subheader("Add New Run")
+        with st.form("add_run_form"):
             distance = st.number_input("Distance (miles)", min_value=0.1, step=0.1)
             date = st.date_input("Date")
-            if st.button("Save Run"):
-                database.add_run(st.session_state.user, distance, date)
+            submit_button = st.form_submit_button("Save Run")
+            if submit_button:
+                # TODO: Implement add_run function in database.py
                 st.success("Run added successfully!")
 
-        elif choice == "Strava Activities":
-            st.subheader("Strava Activities")
-            user_data = database.get_user_data(st.session_state.user)
-            if user_data and user_data['strava_token']:
-                client = get_strava_client()
-                activities = get_strava_activities(client, user_data['strava_token']['access_token'])
-                for activity in activities:
-                    st.write(f"{activity.name} - {activity.distance.num:.2f} miles")
-            else:
-                st.warning("Strava account not connected")
-                client = get_strava_client()
-                auth_url = client.authorization_url(
-                    client_id=st.secrets["STRAVA_CLIENT_ID"],
-                    redirect_uri=st.secrets["STRAVA_REDIRECT_URI"],
-                    scope=['read', 'activity:read_all']
-                )
-                st.markdown(f"[Connect Strava Account]({auth_url})")
+    elif choice == "Strava Activities":
+        st.subheader("Strava Activities")
+        user_data = database.get_user_data(st.session_state.user)
+        if user_data and user_data.get('strava_token'):
+            # TODO: Implement Strava activities display
+            st.info("Strava activities will be displayed here")
+        else:
+            st.warning("Strava account not connected")
+            if st.button("Connect with Strava"):
+                # TODO: Implement Strava OAuth flow
+                st.info("Strava connection flow will be implemented here")
 
-    else:
-        st.subheader("Welcome to Not Boring Runs!")
-        st.write("Please login or sign up to start your running journey.")
+    # Placeholder for map and progress bar
+    st.subheader("Your Journey Progress")
+    st.info("Map and progress bar will be displayed here")
 
 if __name__ == "__main__":
     main()
