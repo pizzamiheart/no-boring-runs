@@ -56,16 +56,29 @@ def show_dashboard():
         create_journey()
     else:
         total_miles, start_date, end_date, current_position = journey
-        st.write(f"Journey: {total_miles} miles")
+        
+        # Calculate progress
+        runs = database.get_user_runs(st.session_state.user)
+        total_run_miles = sum(run['distance'] for run in runs)
+        progress = min(total_run_miles / total_miles, 1.0)
+        
+        # Display progress bar
+        st.subheader("Journey Progress")
+        st.progress(progress)
+        st.write(f"Total Distance: {total_run_miles:.2f} / {total_miles} miles")
         st.write(f"Start Date: {start_date}")
         st.write(f"End Date: {end_date}")
 
         # Display map
         m = map_utils.create_map(current_position)
+        
+        # Add polyline to show user's path
+        path_coordinates = map_utils.get_run_coordinates(st.session_state.user)
+        folium.PolyLine(locations=path_coordinates, weight=2, color='red').add_to(m)
+        
         folium_static(m)
 
         # Display run history
-        runs = database.get_user_runs(st.session_state.user)
         if runs:
             st.subheader("Run History")
             for run in runs:
