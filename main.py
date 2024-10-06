@@ -62,13 +62,15 @@ def display_dashboard():
 
     if choice == "Journey Setup":
         st.subheader("Set Up Your Journey")
+        st.write("Choose your distance and time frame. Pick anywhere in the world you want to run. Update your progress with each run. See what it's like to run through that part of the world!")
         with st.form("journey_setup_form"):
             total_distance = st.number_input("Total planned distance (miles)", min_value=1.0, step=0.1)
             start_date = st.date_input("Start date")
             end_date = st.date_input("End date")
+            location = st.selectbox("Choose your running destination", ["Random", "Sicily, Italy", "Kyoto, Japan", "Machu Picchu, Peru", "Great Barrier Reef, Australia", "Santorini, Greece"])
             submit_button = st.form_submit_button("Start Journey")
             if submit_button:
-                success, message = setup_journey(st.session_state.user, total_distance, start_date, end_date)
+                success, message = setup_journey(st.session_state.user, total_distance, start_date, end_date, location)
                 if success:
                     st.success(message)
                 else:
@@ -103,7 +105,7 @@ def display_dashboard():
     journey = database.get_user_journey(st.session_state.user)
     if journey:
         st.subheader("Your Journey Progress")
-        total_miles, start_date, end_date, current_lat, current_lon = journey
+        total_miles, start_date, end_date, current_lat, current_lon, location = journey
         completed_distance = map_utils.calculate_distance((0, 0), (float(current_lat), float(current_lon)))
         progress = min(1.0, completed_distance / float(total_miles))
         st.progress(progress)
@@ -130,12 +132,15 @@ def display_dashboard():
     else:
         st.info("Set up your journey to see your progress!")
 
-def setup_journey(username, total_distance, start_date, end_date):
+def setup_journey(username, total_distance, start_date, end_date, location):
     try:
-        starting_point = map_utils.generate_random_start_point()
-        success = database.create_user_journey(username, float(total_distance), start_date, end_date, starting_point)
+        if location == "Random":
+            starting_point = map_utils.generate_random_start_point()
+        else:
+            starting_point = map_utils.get_location_coordinates(location)
+        success = database.create_user_journey(username, float(total_distance), start_date, end_date, starting_point, location)
         if success:
-            return True, "Journey set up successfully!"
+            return True, f"Journey set up successfully! You'll be running through {location}!"
         else:
             return False, "Failed to set up journey. Please try again."
     except Exception as e:

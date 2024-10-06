@@ -78,3 +78,14 @@ def update_position(username, distance):
     database.update_user_position(username, (new_lat, new_lon))
 
     return (new_lat, new_lon)
+
+def get_location_coordinates(location):
+    # This is a simplified version. In a real-world scenario, you'd use a geocoding service.
+    coordinates = {
+        "Sicily, Italy": (37.5999938, 14.015356),
+        "Kyoto, Japan": (35.0116363, 135.7680294),
+        "Machu Picchu, Peru": (-13.1631412, -72.5449629),
+        "Great Barrier Reef, Australia": (-18.2870668, 147.6991918),
+        "Santorini, Greece": (36.3931562, 25.4615092)
+    }
+    return coordinates.get(location, generate_random_start_point())

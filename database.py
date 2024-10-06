@@ -45,6 +45,7 @@ def init_db():
         end_date DATE NOT NULL,
         current_lat FLOAT NOT NULL,
         current_lon FLOAT NOT NULL,
+        location VARCHAR(100) NOT NULL,
         FOREIGN KEY (username) REFERENCES users(username)
     )
     """)
@@ -82,7 +83,7 @@ def update_strava_token(username, strava_token):
     conn.close()
     logger.info(f"Strava token updated for user {username}")
 
-def create_user_journey(username, total_miles, start_date, end_date, starting_point):
+def create_user_journey(username, total_miles, start_date, end_date, starting_point, location):
     conn = get_db_connection()
     cur = conn.cursor()
     try:
@@ -91,9 +92,9 @@ def create_user_journey(username, total_miles, start_date, end_date, starting_po
         conn.commit()
         
         cur.execute("""
-        INSERT INTO journeys (username, total_miles, start_date, end_date, current_lat, current_lon)
-        VALUES (%s, %s, %s, %s, %s, %s)
-        """, (username, float(total_miles), start_date, end_date, float(starting_point[0]), float(starting_point[1])))
+        INSERT INTO journeys (username, total_miles, start_date, end_date, current_lat, current_lon, location)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """, (username, float(total_miles), start_date, end_date, float(starting_point[0]), float(starting_point[1]), location))
         conn.commit()
         logger.info(f"Journey created for user {username}")
         return True
@@ -109,7 +110,7 @@ def get_user_journey(username):
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("""
-    SELECT total_miles, start_date, end_date, current_lat, current_lon
+    SELECT total_miles, start_date, end_date, current_lat, current_lon, location
     FROM journeys WHERE username = %s
     """, (username,))
     result = cur.fetchone()
