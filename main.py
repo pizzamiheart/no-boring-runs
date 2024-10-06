@@ -109,7 +109,8 @@ def display_dashboard():
     if journey:
         st.subheader("Your Journey Progress")
         total_miles, start_date, end_date, current_lat, current_lon = journey
-        progress = (float(current_lat) / float(total_miles)) * 100
+        completed_distance = map_utils.calculate_distance((0, 0), (float(current_lat), float(current_lon)))
+        progress = min(1.0, completed_distance / float(total_miles))
         st.progress(progress)
         st.map(pd.DataFrame({'lat': [float(current_lat)], 'lon': [float(current_lon)]}))
 

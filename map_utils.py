@@ -1,6 +1,6 @@
 import folium
 import random
-import database
+from math import radians, sin, cos, sqrt, atan2
 
 def create_map(current_position):
     m = folium.Map(location=current_position, zoom_start=4)
@@ -30,3 +30,18 @@ def get_run_coordinates(username):
         coordinates.append(new_position)
     
     return coordinates
+
+def calculate_distance(start_point, end_point):
+    R = 6371  # Earth's radius in kilometers
+    
+    lat1, lon1 = start_point
+    lat2, lon2 = end_point
+    
+    dlat = radians(lat2 - lat1)
+    dlon = radians(lon2 - lon1)
+    
+    a = sin(dlat/2)**2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlon/2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1-a))
+    
+    distance = R * c
+    return distance * 0.621371  # Convert to miles
