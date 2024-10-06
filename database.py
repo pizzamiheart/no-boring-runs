@@ -27,6 +27,17 @@ def init_db():
     )
     """)
     cur.execute("""
+    CREATE TABLE IF NOT EXISTS runs (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(50) NOT NULL,
+        distance FLOAT NOT NULL,
+        date DATE NOT NULL,
+        FOREIGN KEY (username) REFERENCES users(username)
+    )
+    """)
+    cur.execute("DROP TABLE IF EXISTS journeys")
+    conn.commit()
+    cur.execute("""
     CREATE TABLE IF NOT EXISTS journeys (
         username VARCHAR(50) PRIMARY KEY,
         total_miles FLOAT NOT NULL,
@@ -34,15 +45,6 @@ def init_db():
         end_date DATE NOT NULL,
         current_lat FLOAT NOT NULL,
         current_lon FLOAT NOT NULL,
-        FOREIGN KEY (username) REFERENCES users(username)
-    )
-    """)
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS runs (
-        id SERIAL PRIMARY KEY,
-        username VARCHAR(50) NOT NULL,
-        distance FLOAT NOT NULL,
-        date DATE NOT NULL,
         FOREIGN KEY (username) REFERENCES users(username)
     )
     """)
