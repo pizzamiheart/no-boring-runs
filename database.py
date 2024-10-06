@@ -83,6 +83,10 @@ def create_user_journey(username, total_miles, start_date, end_date, starting_po
     conn = get_db_connection()
     cur = conn.cursor()
     try:
+        # Remove any existing journey for the user
+        cur.execute("DELETE FROM journeys WHERE username = %s", (username,))
+        conn.commit()
+        
         cur.execute("""
         INSERT INTO journeys (username, total_miles, start_date, end_date, current_position)
         VALUES (%s, %s, %s, %s, POINT(%s, %s))

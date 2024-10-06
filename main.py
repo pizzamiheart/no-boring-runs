@@ -107,7 +107,7 @@ def display_dashboard():
     if journey:
         st.subheader("Your Journey Progress")
         total_miles, start_date, end_date, current_position = journey
-        progress = (current_position[0] / total_miles) * 100
+        progress = (float(current_position[0]) / float(total_miles)) * 100
         st.progress(progress)
         st.map(pd.DataFrame({'lat': [current_position[0]], 'lon': [current_position[1]]}))
 
@@ -125,7 +125,7 @@ def display_dashboard():
 def setup_journey(username, total_distance, start_date, end_date):
     try:
         starting_point = map_utils.generate_random_start_point()
-        success = database.create_user_journey(username, total_distance, start_date, end_date, starting_point)
+        success = database.create_user_journey(username, float(total_distance), start_date, end_date, starting_point)
         if success:
             return True, "Journey set up successfully!"
         else:
