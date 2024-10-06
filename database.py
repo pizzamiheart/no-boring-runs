@@ -90,7 +90,7 @@ def create_user_journey(username, total_miles, start_date, end_date, starting_po
         cur.execute("""
         INSERT INTO journeys (username, total_miles, start_date, end_date, current_position)
         VALUES (%s, %s, %s, %s, POINT(%s, %s))
-        """, (username, total_miles, start_date, end_date, starting_point[0], starting_point[1]))
+        """, (username, float(total_miles), start_date, end_date, float(starting_point[0]), float(starting_point[1])))
         conn.commit()
         logger.info(f"Journey created for user {username}")
         return True
@@ -106,7 +106,7 @@ def get_user_journey(username):
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("""
-    SELECT total_miles, start_date, end_date, current_position
+    SELECT total_miles, start_date, end_date, ST_X(current_position) as lat, ST_Y(current_position) as lon
     FROM journeys WHERE username = %s
     """, (username,))
     result = cur.fetchone()
@@ -120,7 +120,7 @@ def update_user_position(username, new_position):
     cur.execute("""
     UPDATE journeys SET current_position = POINT(%s, %s)
     WHERE username = %s
-    """, (new_position[0], new_position[1], username))
+    """, (float(new_position[0]), float(new_position[1]), username))
     conn.commit()
     cur.close()
     conn.close()
@@ -133,7 +133,7 @@ def add_run(username, distance, date):
         cur.execute("""
         INSERT INTO runs (username, distance, date)
         VALUES (%s, %s, %s)
-        """, (username, distance, date))
+        """, (username, float(distance), date))
         conn.commit()
         logger.info(f"Run added for user {username}")
         return True

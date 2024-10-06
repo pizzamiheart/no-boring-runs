@@ -72,8 +72,10 @@ def display_dashboard():
                 if success:
                     st.success(message)
                     # Display the starting point on a map
-                    starting_point = database.get_user_journey(st.session_state.user)[3]
-                    st.map(pd.DataFrame({'lat': [starting_point[0]], 'lon': [starting_point[1]]}))
+                    journey = database.get_user_journey(st.session_state.user)
+                    if journey:
+                        _, _, _, lat, lon = journey
+                        st.map(pd.DataFrame({'lat': [float(lat)], 'lon': [float(lon)]}))
                 else:
                     st.error(message)
 
@@ -106,10 +108,10 @@ def display_dashboard():
     journey = database.get_user_journey(st.session_state.user)
     if journey:
         st.subheader("Your Journey Progress")
-        total_miles, start_date, end_date, current_position = journey
-        progress = (float(current_position[0]) / float(total_miles)) * 100
+        total_miles, start_date, end_date, lat, lon = journey
+        progress = (float(lat) / float(total_miles)) * 100
         st.progress(progress)
-        st.map(pd.DataFrame({'lat': [current_position[0]], 'lon': [current_position[1]]}))
+        st.map(pd.DataFrame({'lat': [float(lat)], 'lon': [float(lon)]}))
 
         # Display user's runs
         runs = database.get_user_runs(st.session_state.user)
